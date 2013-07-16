@@ -1,0 +1,15 @@
+# iogadget pkg-config source file
+
+prefix=HOME
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: IOGadget
+Description: Bibliothéque d'écriture et de lecture des fichiers gadgets. Elle supporte les format 1 et 2, ainsi que le format hdf5.
+Version: VERSION
+Requires:
+Conflicts:
+Libs: -L${libdir}/ -lIOGadget
+Libs.private: -lIOGadget
+Cflags: -I${includedir}/
