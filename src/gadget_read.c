@@ -1,4 +1,4 @@
-#include "gadget/gadget_read.h"
+#include "IOGadget/gadget_read.h"
 
 #define SKIP fread(&dummy, sizeof(dummy), 1, fd);
 #define SKIP2 fread(&dummy2, sizeof(dummy), 1, fd);
@@ -221,7 +221,7 @@ Particule Gadget_Read_format1(const char *fname, Header *header, int files, bool
 Particule Gadget_Read_format2(const char *fname, Header *header, int files, bool b_potential, bool b_acceleration, bool b_rate_entropy, bool b_timestep)
 {
 	FILE *fd;
-	char buf[200], label[4];
+	char buf[200], label[5] = {0};
 	int i, k, dummy, dummy2, ntot_withmasses;
 	int n, pc, pc_new, pc_sph;
 	int NumPart = 0;
@@ -447,3 +447,46 @@ Particule Gadget_Read_format2(const char *fname, Header *header, int files, bool
 
 	return P;
 }
+
+#ifdef USE_HDF5
+void read_header_attributes_in_hdf5(char *fname)
+{
+	hid_t hdf5_file, hdf5_headergrp, hdf5_attribute;
+
+
+	hdf5_file = H5Fopen(fname, H5F_ACC_RDONLY, H5P_DEFAULT);
+	hdf5_headergrp = H5Gopen(hdf5_file, "/Header");
+
+
+	hdf5_attribute = H5Aopen_name(hdf5_headergrp, "NumPart_ThisFile");
+	H5Aread(hdf5_attribute, H5T_NATIVE_INT, header.npart);
+	H5Aclose(hdf5_attribute);
+
+	hdf5_attribute = H5Aopen_name(hdf5_headergrp, "NumPart_Total");
+	H5Aread(hdf5_attribute, H5T_NATIVE_UINT, header.npartTotal);
+	H5Aclose(hdf5_attribute);
+
+	hdf5_attribute = H5Aopen_name(hdf5_headergrp, "NumPart_Total_HighWord");
+	H5Aread(hdf5_attribute, H5T_NATIVE_UINT, header.npartTotalHighWord);
+	H5Aclose(hdf5_attribute);
+
+	hdf5_attribute = H5Aopen_name(hdf5_headergrp, "MassTable");
+	H5Aread(hdf5_attribute, H5T_NATIVE_DOUBLE, header.mass);
+	H5Aclose(hdf5_attribute);
+
+	hdf5_attribute = H5Aopen_name(hdf5_headergrp, "Time");
+	H5Aread(hdf5_attribute, H5T_NATIVE_DOUBLE, &header.time);
+	H5Aclose(hdf5_attribute);
+
+	hdf5_attribute = H5Aopen_name(hdf5_headergrp, "NumFilesPerSnapshot");
+	H5Aread(hdf5_attribute, H5T_NATIVE_INT, &header.num_files);
+	H5Aclose(hdf5_attribute);
+
+	hdf5_attribute = H5Aopen_name(hdf5_headergrp, "Flag_Entropy_ICs");
+	H5Aread(hdf5_attribute, H5T_NATIVE_INT, &header.flag_entropy_instead_u);
+	H5Aclose(hdf5_attribute);
+
+	H5Gclose(hdf5_headergrp);
+	H5Fclose(hdf5_file);
+}
+#endif
