@@ -217,5 +217,7 @@ bool Gadget_Write_format2(const char *name, const Header header, const Particule
 		}
 	}
 
+	fclose(fd);
+
 	return true;
 }
