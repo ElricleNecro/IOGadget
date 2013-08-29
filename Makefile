@@ -11,7 +11,7 @@ PREFIX   = $$HOME/.local
 
 PCFILE   = iogadget.pc
 SRCS    := src/gadget_write.c src/gadget_read.c
-HDRS    := include/gadget/gadget_read.h include/gadget/gadget_write.h include/gadget/gadget.h include/gadget/types.h
+HDRS    := include/IOGadget/gadget_read.h include/IOGadget/gadget_write.h include/IOGadget/gadget.h include/IOGadget/types.h
 #$(shell find $(SRCDIR) -name '*.$(SRCEXT)')
 SRCDIRS := $(shell find . -name '*.$(SRCEXT)' -exec dirname {} \; | uniq)
 OBJS    := $(patsubst %.$(SRCEXT),$(OBJDIR)/%.o,$(SRCS))
