@@ -1,1 +1,4 @@
 build/*
+include/conf.h
+src/conf.c
+read_ic.c
