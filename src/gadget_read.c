@@ -1,13 +1,17 @@
 #include "IOGadget/gadget_read.h"
 
+static char *error = NULL;
+
+
+
 #define SKIP fread(&dummy, sizeof(dummy), 1, fd);
-#define SKIP2 fread(&dummy2, sizeof(dummy), 1, fd);
+#define SKIP2 fread(&dummy2, sizeof(dummy2), 1, fd);
 
 Particule Gadget_Read_format1(const char *fname, Header *header, int files, bool b_potential, bool b_acceleration, bool b_rate_entropy, bool b_timestep)
 {
 	FILE *fd;
 	char buf[200];
-	int i, k, dummy, ntot_withmasses;
+	int i, k, dummy, dummy2, ntot_withmasses;
 	int n, pc, pc_new, pc_sph;
 	int NumPart = 0;
 	Particule P = NULL;
@@ -23,7 +27,9 @@ Particule Gadget_Read_format1(const char *fname, Header *header, int files, bool
 		{
 			perror("Can't open file:");
 			printf("can't open file `%s`\n", buf);
-			exit(EXIT_FAILURE);
+			error = "Can't open file.";
+			return NULL;
+			/*exit(EXIT_FAILURE);*/
 		}
 
 		printf("reading `%s' ...\n", buf);
@@ -89,7 +95,6 @@ Particule Gadget_Read_format1(const char *fname, Header *header, int files, bool
 		{
 			for(n = 0; n < header->npart[k]; n++)
 			{
-				/*fread(&Id[pc_new], sizeof(int), 1, fd);*/
 				fread(&P[pc_new].Id, sizeof(int), 1, fd);
 				pc_new++;
 			}
@@ -208,7 +213,7 @@ Particule Gadget_Read_format1(const char *fname, Header *header, int files, bool
 			if( dummy != dummy2 ) \
 			{ \
 				fprintf(stderr, "%s:%s:%d :: Block size invalid for label %s: %d != %d\n", __FILE__, __func__, __LINE__, label, dummy, dummy2); \
-				exit(EXIT_FAILURE); \
+				return NULL; /*exit(EXIT_FAILURE); \*/ \
 			}
 #define GET_LABEL \
 			SKIP; \
@@ -238,7 +243,9 @@ Particule Gadget_Read_format2(const char *fname, Header *header, int files, bool
 		{
 			perror("Can't open file:");
 			printf("can't open file `%s`\n", buf);
-			exit(EXIT_FAILURE);
+			error = "Can't open file.";
+			return NULL;
+			/*exit(EXIT_FAILURE);*/
 		}
 
 		printf("reading `%s' ...\n", buf);
