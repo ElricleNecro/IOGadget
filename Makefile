@@ -10,8 +10,8 @@ LIBDIR   = build
 PREFIX   = $$HOME/.local
 
 PCFILE   = iogadget.pc
-SRCS    := src/gadget_write.c src/gadget_read.c src/other.c
-HDRS    := include/IOGadget/gadget_read.h include/IOGadget/gadget_write.h include/IOGadget/gadget.h include/IOGadget/types.h include/IOGadget/other.h
+SRCS    := src/gadget_write.c src/gadget_read.c src/other.c src/error.c
+HDRS    := include/IOGadget/gadget_read.h include/IOGadget/gadget_write.h include/IOGadget/gadget.h include/IOGadget/types.h include/IOGadget/other.h include/IOGadget/error.h
 #$(shell find $(SRCDIR) -name '*.$(SRCEXT)')
 SRCDIRS := $(shell find . -name '*.$(SRCEXT)' -exec dirname {} \; | uniq)
 OBJS    := $(patsubst %.$(SRCEXT),$(OBJDIR)/%.o,$(SRCS))
