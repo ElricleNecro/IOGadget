@@ -1,5 +1,5 @@
 LIB      = IOGadget
-VERSION  = 0.2
+VERSION  = 0.3
 
 SRCEXT   = c
 SRCDIR   = src
