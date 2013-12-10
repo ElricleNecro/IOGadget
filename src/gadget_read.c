@@ -1,12 +1,8 @@
 #include "IOGadget/gadget_read.h"
 
-static char *error = NULL;
-
-
-
 #define SKIP fread(&dummy, sizeof(dummy), 1, fd);
 #define SKIP2 fread(&dummy2, sizeof(dummy2), 1, fd);
-#define TEST_SS2 if(dummy != dummy2) { error = "Wrong block!"; return NULL; }
+#define TEST_SS2 if(dummy != dummy2) { SetError("Wrong block!"); return NULL; }
 
 Particule Gadget_Read_format1(const char *fname, Header *header, int files, bool b_potential, bool b_acceleration, bool b_rate_entropy, bool b_timestep)
 {
@@ -28,7 +24,8 @@ Particule Gadget_Read_format1(const char *fname, Header *header, int files, bool
 		{
 			perror("Can't open file:");
 			printf("can't open file `%s`\n", buf);
-			error = "Can't open file.";
+			/*error = "Can't open file.";*/
+			SetError("Can't open file.");
 			return NULL;
 			/*exit(EXIT_FAILURE);*/
 		}
@@ -63,6 +60,7 @@ Particule Gadget_Read_format1(const char *fname, Header *header, int files, bool
 			if( (P = malloc(NumPart * sizeof(struct _particule_data))) == NULL )
 			{
 				perror("Allocate memory failed:");
+				SetError("Allocation failed!");
 				return NULL;
 			}
 			printf("allocating memory...done\n");
@@ -227,6 +225,7 @@ Particule Gadget_Read_format1(const char *fname, Header *header, int files, bool
 			if( dummy != dummy2 ) \
 			{ \
 				fprintf(stderr, "%s:%s:%d :: Block size invalid for label %s: %d != %d\n", __FILE__, __func__, __LINE__, label, dummy, dummy2); \
+				SetError("Wrong Block size!"); \
 				return NULL; /*exit(EXIT_FAILURE); \*/ \
 			}
 #define GET_LABEL \
@@ -257,7 +256,8 @@ Particule Gadget_Read_format2(const char *fname, Header *header, int files, bool
 		{
 			perror("Can't open file:");
 			printf("can't open file `%s`\n", buf);
-			error = "Can't open file.";
+			/*error = "Can't open file.";*/
+			SetError("Can't open file.");
 			return NULL;
 			/*exit(EXIT_FAILURE);*/
 		}
