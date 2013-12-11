@@ -30,18 +30,30 @@ bool Gadget_Write_format1(const char *name, const Header header, const Particule
 
 	SKIP;
 	for(int i=0; i<NbPart; i++)
+	{
+		float tmp[3];
+		for(int j=0; j<3; j++)
+			tmp[j] = part[i].Pos[j];
+
 		for(int j=0; j<3; j++)
 		{
-			fwrite(&part[i].Pos[j], sizeof(float), 1, fd);
+			fwrite(&tmp[j], sizeof(float), 1, fd);
 		}
+	}
 	SKIP;
 
 	SKIP;
 	for(int i=0; i<NbPart; i++)
+	{
+		float tmp[3];
+		for(int j=0; j<3; j++)
+			tmp[j] = part[i].Vit[j];
+
 		for(int j=0; j<3; j++)
 		{
-			fwrite(&part[i].Vit[j], sizeof(float), 1, fd);
+			fwrite(&tmp[j], sizeof(float), 1, fd);
 		}
+	}
 	SKIP;
 
 	blksize = NbPart * sizeof(unsigned int);
@@ -54,13 +66,15 @@ bool Gadget_Write_format1(const char *name, const Header header, const Particule
 	if( ntot_withmasses > 0 )
 	{
 		SKIP;
+		double tmp;
 		for(int i = 0; i < 6; i++)
 		{
 			if( header.mass[i] == 0. && header.npart[i] != 0 )
 			{
 				for(int k=0; k<header.npart[i]; k++)
 				{
-					fwrite(&part[pc_new].m, sizeof(float), 1, fd);
+					tmp = part[pc_new].m;
+					fwrite(&tmp, sizeof(float), 1, fd);
 					pc_new++;
 				}
 			}
