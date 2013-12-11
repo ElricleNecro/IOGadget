@@ -71,7 +71,9 @@ Particule Gadget_Read_format1(const char *fname, Header *header, int files, bool
 		{
 			for(n = 0; n < header->npart[k]; n++)
 			{
-				fread(&P[pc_new].Pos[0], sizeof(float), 3, fd);
+				double tmp[3];
+				fread(&tmp, sizeof(float), 3, fd);
+				for(int j=0; j<3; j++) P[pc_new].Pos[j] = tmp[j];
 				pc_new++;
 			}
 		}
@@ -83,7 +85,9 @@ Particule Gadget_Read_format1(const char *fname, Header *header, int files, bool
 		{
 			for(n = 0; n < header->npart[k]; n++)
 			{
-				fread(&P[pc_new].Vit[0], sizeof(float), 3, fd);
+				double tmp[3];
+				fread(&tmp, sizeof(float), 3, fd);
+				for(int j=0; j<3; j++) P[pc_new].Vit[j] = tmp[j];
 				pc_new++;
 			}
 		}
@@ -113,7 +117,11 @@ Particule Gadget_Read_format1(const char *fname, Header *header, int files, bool
 				P[pc_new].Type = k;
 
 				if(header->mass[k] == 0)
-					fread(&P[pc_new].m, sizeof(float), 1, fd);
+				{
+					double m;
+					fread(&m, sizeof(float), 1, fd);
+					P[pc_new].m = m;
+				}
 				else
 					P[pc_new].m = header->mass[k];
 				pc_new++;
@@ -131,7 +139,9 @@ Particule Gadget_Read_format1(const char *fname, Header *header, int files, bool
 			SKIP;
 			for(n = 0, pc_sph = pc; n < header->npart[0]; n++)
 			{
-				fread(&P[pc_sph].U, sizeof(float), 1, fd);
+				double tmp;
+				fread(&tmp, sizeof(float), 1, fd);
+				P[pc_sph].U = tmp;
 				pc_sph++;
 			}
 			SKIP2;
@@ -140,7 +150,9 @@ Particule Gadget_Read_format1(const char *fname, Header *header, int files, bool
 			SKIP;
 			for(n = 0, pc_sph = pc; n < header->npart[0]; n++)
 			{
-				fread(&P[pc_sph].Rho, sizeof(float), 1, fd);
+				double tmp;
+				fread(&tmp, sizeof(float), 1, fd);
+				P[pc_sph].Rho = tmp;
 				pc_sph++;
 			}
 			SKIP2;
@@ -151,7 +163,9 @@ Particule Gadget_Read_format1(const char *fname, Header *header, int files, bool
 				SKIP;
 				for(n = 0, pc_sph = pc; n < header->npart[0]; n++)
 				{
-					fread(&P[pc_sph].Ne, sizeof(float), 1, fd);
+					double tmp;
+					fread(&tmp, sizeof(float), 1, fd);
+					P[pc_sph].Ne = tmp;
 					pc_sph++;
 				}
 				SKIP2;
@@ -168,10 +182,14 @@ Particule Gadget_Read_format1(const char *fname, Header *header, int files, bool
 		if( b_potential )
 		{
 			SKIP;
+			double tmp;
 			for(k = 0, pc_new = pc; k < 6; k++)
 			{
 				for(n = 0; n < header->npart[k]; n++)
-					fread(&P[pc_new].Pot, sizeof(float), 1, fd);
+				{
+					fread(&tmp, sizeof(float), 1, fd);
+					P[pc_new].Pot = tmp;
+				}
 			}
 			SKIP2;
 			TEST_SS2;
@@ -180,10 +198,15 @@ Particule Gadget_Read_format1(const char *fname, Header *header, int files, bool
 		if( b_acceleration )
 		{
 			SKIP;
+			double tmp[3];
 			for(k = 0, pc_new = pc; k < 6; k++)
 			{
 				for(n = 0; n < header->npart[k]; n++)
-					fread(&P[pc_new].Acc[0], sizeof(float), 3, fd);
+				{
+					fread(&tmp, sizeof(float), 3, fd);
+					for(int j=0; j<3; j++) P[pc_new].Acc[j] = tmp[j];
+					pc_new++;
+				}
 			}
 			SKIP2;
 			TEST_SS2;
@@ -192,9 +215,11 @@ Particule Gadget_Read_format1(const char *fname, Header *header, int files, bool
 		if( b_rate_entropy && header->npart[0] > 0 )
 		{
 			SKIP;
+			double tmp;
 			for(n = 0, pc_sph = pc; n < header->npart[0]; n++)
 			{
-				fread(&P[pc_sph].dAdt, sizeof(float), 1, fd);
+				fread(&tmp, sizeof(float), 1, fd);
+				P[pc_sph].dAdt = tmp;
 				pc_sph++;
 			}
 			SKIP2;
@@ -204,11 +229,13 @@ Particule Gadget_Read_format1(const char *fname, Header *header, int files, bool
 		if( b_timestep )
 		{
 			SKIP;
+			double tmp;
 			for(k = 0, pc_new = pc; k < 6; k++)
 			{
 				for(n = 0; n < header->npart[k]; n++)
 				{
-					fread(&P[pc_new].ts, sizeof(float), 1, fd);
+					fread(&tmp, sizeof(float), 1, fd);
+					P[pc_new].ts = tmp;
 				}
 			}
 			SKIP2;

@@ -26,16 +26,16 @@ typedef struct io_header
 } Header;                               		/*!< holds header for snapshot files */
 
 typedef struct _particule_data {
-	float Pos[3];
-	float Vit[3];
-	float m;
-	float Pot;
-	float Acc[3];
-	float dAdt;
-	float ts;
-	float Rho;
-	float U;
-	float Ne;
+	double Pos[3];
+	double Vit[3];
+	double m;
+	double Pot;
+	double Acc[3];
+	double dAdt;
+	double ts;
+	double Rho;
+	double U;
+	double Ne;
 	int Id;
 	int Type;
 }*Particule;
