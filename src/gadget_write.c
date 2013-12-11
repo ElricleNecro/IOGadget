@@ -7,21 +7,11 @@ bool Gadget_Write_format1(const char *name, const Header header, const Particule
 	FILE *fd = NULL;
 	int blksize, NbPart = 0, ntot_withmasses = 0, pc_new = 0;
 
-	//fprintf(stderr, "File name : %s\n", name);
-
 	if(!(fd = fopen(name, "w")))
 	{
 		perror("Can't open file for writing snapshot: ");
 		return false;
 	}
-
-	//printf("\033[36mHeader du fichier Gadget (format 1) :\033[00m\n");
-	//printf("\033[34m\tNombre de fichier par snapshot : %d\n", header.num_files);
-	//printf("\tMasse et nombre d'éléments des catégories d'objet :\n");
-	//for(int i = 0; i < 6; i++)
-		//printf("\t\t%s : Masse %g, et %d élément%c (total : %d)\n", (i == 0)?"Gaz":( (i == 1)?"Halo":( (i == 2)?"Disk":( (i==3)?"Bulge":( (i==4)?"Stars":"Bndry" )))), header.mass[i], header.npart[i], (header.npart[i] > 1)?'s':' ', header.npartTotal[i]);
-	//puts("\033[00m");
-	//printf("\033[31m\tTaille de la boîte : %g\033[00m\n", header.BoxSize);
 
 	blksize = sizeof(header);
 	SKIP;
