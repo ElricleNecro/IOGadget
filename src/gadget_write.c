@@ -2,7 +2,7 @@
 
 #define SKIP  {fwrite(&blksize,sizeof(int),1,fd);}
 
-bool Gadget_Write_format1(const char *name, const Header header, const Particule part)
+bool Float_Gadget_Write_format1(const char *name, const Header header, const Particule_f part)
 {
 	FILE *fd = NULL;
 	int blksize, NbPart = 0, ntot_withmasses = 0, pc_new = 0;
@@ -88,7 +88,7 @@ bool Gadget_Write_format1(const char *name, const Header header, const Particule
 	fwrite(&(M_nextblock), sizeof(int), 1, fd); \
 	fwrite(&label_size, sizeof(int), 1, fd);
 
-bool Gadget_Write_format2(const char *name, const Header header, const Particule part)
+bool Float_Gadget_Write_format2(const char *name, const Header header, const Particule_f part)
 {
 	FILE *fd            = NULL;
 	int blksize         = 0,

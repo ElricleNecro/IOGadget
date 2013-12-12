@@ -25,7 +25,7 @@ typedef struct io_header
 	char		fill[60];	                /*!< fills to 256 Bytes */
 } Header;                               		/*!< holds header for snapshot files */
 
-typedef struct _particule_data {
+typedef struct _particule_data_f {
 	float Pos[3];
 	float Vit[3];
 	float m;
@@ -38,6 +38,6 @@ typedef struct _particule_data {
 	float Ne;
 	int Id;
 	int Type;
-}*Particule;
+}*Particule_f;
 
 #endif /* end of include guard */
