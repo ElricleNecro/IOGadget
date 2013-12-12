@@ -11,7 +11,7 @@ Particule_f Float_Gadget_Read_format1(const char *fname, Header *header, int fil
 	int i, k, dummy, dummy2, ntot_withmasses;
 	int n, pc, pc_new, pc_sph;
 	int NumPart = 0;
-	Particule P = NULL;
+	Particule_f P = NULL;
 
 	for(i = 0, pc = 0; i < files; i++, pc = pc_new)
 	{
@@ -243,7 +243,7 @@ Particule_f Float_Gadget_Read_format2(const char *fname, Header *header, int fil
 	int i, k, dummy, dummy2, ntot_withmasses;
 	int n, pc, pc_new, pc_sph;
 	int NumPart = 0;
-	Particule P = NULL;
+	Particule_f P = NULL;
 
 	for(i = 0, pc = 0; i < files; i++, pc = pc_new)
 	{
