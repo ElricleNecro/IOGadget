@@ -11,4 +11,7 @@
 bool Float_Gadget_Write_format1(const char *name, const Header header, const Particule_f part);
 bool Float_Gadget_Write_format2(const char *name, const Header header, const Particule_f part);
 
+bool Double_Gadget_Write_format1(const char *name, const Header header, const Particule_d part);
+bool Double_Gadget_Write_format2(const char *name, const Header header, const Particule_d part);
+
 #endif /* end of include guard */

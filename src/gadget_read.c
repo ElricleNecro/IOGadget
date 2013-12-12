@@ -71,7 +71,9 @@ Particule_f Float_Gadget_Read_format1(const char *fname, Header *header, int fil
 		{
 			for(n = 0; n < header->npart[k]; n++)
 			{
-				fread(&P[pc_new].Pos[0], sizeof(float), 3, fd);
+				float tmp[3];
+				fread(&tmp, sizeof(float), 3, fd);
+				for(int j=0; j<3; j++) P[pc_new].Pos[j] = tmp[j];
 				pc_new++;
 			}
 		}
@@ -83,7 +85,9 @@ Particule_f Float_Gadget_Read_format1(const char *fname, Header *header, int fil
 		{
 			for(n = 0; n < header->npart[k]; n++)
 			{
-				fread(&P[pc_new].Vit[0], sizeof(float), 3, fd);
+				float tmp[3];
+				fread(&tmp, sizeof(float), 3, fd);
+				for(int j=0; j<3; j++) P[pc_new].Vit[j] = tmp[j];
 				pc_new++;
 			}
 		}
@@ -113,7 +117,11 @@ Particule_f Float_Gadget_Read_format1(const char *fname, Header *header, int fil
 				P[pc_new].Type = k;
 
 				if(header->mass[k] == 0)
-					fread(&P[pc_new].m, sizeof(float), 1, fd);
+				{
+					float m;
+					fread(&m, sizeof(float), 1, fd);
+					P[pc_new].m = m;
+				}
 				else
 					P[pc_new].m = header->mass[k];
 				pc_new++;
@@ -131,7 +139,9 @@ Particule_f Float_Gadget_Read_format1(const char *fname, Header *header, int fil
 			SKIP;
 			for(n = 0, pc_sph = pc; n < header->npart[0]; n++)
 			{
-				fread(&P[pc_sph].U, sizeof(float), 1, fd);
+				float tmp;
+				fread(&tmp, sizeof(float), 1, fd);
+				P[pc_sph].U = tmp;
 				pc_sph++;
 			}
 			SKIP2;
@@ -140,7 +150,9 @@ Particule_f Float_Gadget_Read_format1(const char *fname, Header *header, int fil
 			SKIP;
 			for(n = 0, pc_sph = pc; n < header->npart[0]; n++)
 			{
-				fread(&P[pc_sph].Rho, sizeof(float), 1, fd);
+				float tmp;
+				fread(&tmp, sizeof(float), 1, fd);
+				P[pc_sph].Rho = tmp;
 				pc_sph++;
 			}
 			SKIP2;
@@ -151,7 +163,9 @@ Particule_f Float_Gadget_Read_format1(const char *fname, Header *header, int fil
 				SKIP;
 				for(n = 0, pc_sph = pc; n < header->npart[0]; n++)
 				{
-					fread(&P[pc_sph].Ne, sizeof(float), 1, fd);
+					float tmp;
+					fread(&tmp, sizeof(float), 1, fd);
+					P[pc_sph].Ne = tmp;
 					pc_sph++;
 				}
 				SKIP2;
@@ -168,10 +182,14 @@ Particule_f Float_Gadget_Read_format1(const char *fname, Header *header, int fil
 		if( b_potential )
 		{
 			SKIP;
+			float tmp;
 			for(k = 0, pc_new = pc; k < 6; k++)
 			{
 				for(n = 0; n < header->npart[k]; n++)
-					fread(&P[pc_new].Pot, sizeof(float), 1, fd);
+				{
+					fread(&tmp, sizeof(float), 1, fd);
+					P[pc_new].Pot = tmp;
+				}
 			}
 			SKIP2;
 			TEST_SS2;
@@ -180,10 +198,15 @@ Particule_f Float_Gadget_Read_format1(const char *fname, Header *header, int fil
 		if( b_acceleration )
 		{
 			SKIP;
+			float tmp[3];
 			for(k = 0, pc_new = pc; k < 6; k++)
 			{
 				for(n = 0; n < header->npart[k]; n++)
-					fread(&P[pc_new].Acc[0], sizeof(float), 3, fd);
+				{
+					fread(&tmp, sizeof(float), 3, fd);
+					for(int j=0; j<3; j++) P[pc_new].Acc[j] = tmp[j];
+					pc_new++;
+				}
 			}
 			SKIP2;
 			TEST_SS2;
@@ -192,9 +215,11 @@ Particule_f Float_Gadget_Read_format1(const char *fname, Header *header, int fil
 		if( b_rate_entropy && header->npart[0] > 0 )
 		{
 			SKIP;
+			float tmp;
 			for(n = 0, pc_sph = pc; n < header->npart[0]; n++)
 			{
-				fread(&P[pc_sph].dAdt, sizeof(float), 1, fd);
+				fread(&tmp, sizeof(float), 1, fd);
+				P[pc_sph].dAdt = tmp;
 				pc_sph++;
 			}
 			SKIP2;
@@ -204,11 +229,257 @@ Particule_f Float_Gadget_Read_format1(const char *fname, Header *header, int fil
 		if( b_timestep )
 		{
 			SKIP;
+			float tmp;
 			for(k = 0, pc_new = pc; k < 6; k++)
 			{
 				for(n = 0; n < header->npart[k]; n++)
 				{
-					fread(&P[pc_new].ts, sizeof(float), 1, fd);
+					fread(&tmp, sizeof(float), 1, fd);
+					P[pc_new].ts = tmp;
+				}
+			}
+			SKIP2;
+			TEST_SS2;
+		}
+
+		fclose(fd);
+	}
+
+	return P;
+}
+
+Particule_d Double_Gadget_Read_format1(const char *fname, Header *header, int files, bool b_potential, bool b_acceleration, bool b_rate_entropy, bool b_timestep)
+{
+	FILE *fd;
+	char buf[200];
+	int i, k, dummy, dummy2, ntot_withmasses;
+	int n, pc, pc_new, pc_sph;
+	int NumPart = 0;
+	Particule_d P = NULL;
+
+	for(i = 0, pc = 0; i < files; i++, pc = pc_new)
+	{
+		if(files > 1)
+			sprintf(buf, "%s.%d", fname, i);
+		else
+			sprintf(buf, "%s", fname);
+
+		if(!(fd = fopen(buf, "r")))
+		{
+			perror("Can't open file:");
+			printf("can't open file `%s`\n", buf);
+			/*error = "Can't open file.";*/
+			SetError("Can't open file.");
+			return NULL;
+			/*exit(EXIT_FAILURE);*/
+		}
+
+		printf("reading `%s' ...\n", buf);
+		fflush(stdout);
+
+		fread(&dummy, sizeof(dummy), 1, fd);
+		fread(header, sizeof(Header), 1, fd);
+		fread(&dummy, sizeof(dummy), 1, fd);
+
+		if(files == 1)
+		{
+			for(k = 0, NumPart = 0, ntot_withmasses = 0; k < 6; k++)
+				NumPart += header->npart[k];
+		}
+		else
+		{
+			for(k = 0, NumPart = 0, ntot_withmasses = 0; k < 6; k++)
+				NumPart += header->npartTotal[k];
+		}
+
+		for(k = 0, ntot_withmasses = 0; k < 6; k++)
+		{
+			if(header->mass[k] == 0)
+				ntot_withmasses += header->npart[k];
+		}
+
+		if(i == 0)
+		{
+			printf("allocating memory for %d particules...\n", NumPart);
+			if( (P = malloc(NumPart * sizeof(struct _particule_data_d))) == NULL )
+			{
+				perror("Allocate memory failed:");
+				SetError("Allocation failed!");
+				return NULL;
+			}
+			printf("allocating memory...done\n");
+		}
+
+		SKIP;
+		for(k = 0, pc_new = pc; k < 6; k++)
+		{
+			for(n = 0; n < header->npart[k]; n++)
+			{
+				float tmp[3];
+				fread(&tmp, sizeof(float), 3, fd);
+				for(int j=0; j<3; j++) P[pc_new].Pos[j] = tmp[j];
+				pc_new++;
+			}
+		}
+		SKIP2;
+		TEST_SS2;
+
+		SKIP;
+		for(k = 0, pc_new = pc; k < 6; k++)
+		{
+			for(n = 0; n < header->npart[k]; n++)
+			{
+				float tmp[3];
+				fread(&tmp, sizeof(float), 3, fd);
+				for(int j=0; j<3; j++) P[pc_new].Vit[j] = tmp[j];
+				pc_new++;
+			}
+		}
+		SKIP2;
+		TEST_SS2;
+
+
+		SKIP;
+		for(k = 0, pc_new = pc; k < 6; k++)
+		{
+			for(n = 0; n < header->npart[k]; n++)
+			{
+				fread(&P[pc_new].Id, sizeof(int), 1, fd);
+				pc_new++;
+			}
+		}
+		SKIP2;
+		TEST_SS2;
+
+
+		if(ntot_withmasses > 0)
+			SKIP;
+		for(k = 0, pc_new = pc; k < 6; k++)
+		{
+			for(n = 0; n < header->npart[k]; n++)
+			{
+				P[pc_new].Type = k;
+
+				if(header->mass[k] == 0)
+				{
+					float m;
+					fread(&m, sizeof(float), 1, fd);
+					P[pc_new].m = m;
+				}
+				else
+					P[pc_new].m = header->mass[k];
+				pc_new++;
+			}
+		}
+		if(ntot_withmasses > 0)
+		{
+			SKIP2;
+			TEST_SS2;
+		}
+
+
+		if(header->npart[0] > 0)
+		{
+			SKIP;
+			for(n = 0, pc_sph = pc; n < header->npart[0]; n++)
+			{
+				float tmp;
+				fread(&tmp, sizeof(float), 1, fd);
+				P[pc_sph].U = tmp;
+				pc_sph++;
+			}
+			SKIP2;
+			TEST_SS2;
+
+			SKIP;
+			for(n = 0, pc_sph = pc; n < header->npart[0]; n++)
+			{
+				float tmp;
+				fread(&tmp, sizeof(float), 1, fd);
+				P[pc_sph].Rho = tmp;
+				pc_sph++;
+			}
+			SKIP2;
+			TEST_SS2;
+
+			if(header->flag_cooling)
+			{
+				SKIP;
+				for(n = 0, pc_sph = pc; n < header->npart[0]; n++)
+				{
+					float tmp;
+					fread(&tmp, sizeof(float), 1, fd);
+					P[pc_sph].Ne = tmp;
+					pc_sph++;
+				}
+				SKIP2;
+				TEST_SS2;
+			}
+			else
+				for(n = 0, pc_sph = pc; n < header->npart[0]; n++)
+				{
+					P[pc_sph].Ne = 1.0;
+					pc_sph++;
+				}
+		}
+
+		if( b_potential )
+		{
+			SKIP;
+			float tmp;
+			for(k = 0, pc_new = pc; k < 6; k++)
+			{
+				for(n = 0; n < header->npart[k]; n++)
+				{
+					fread(&tmp, sizeof(float), 1, fd);
+					P[pc_new].Pot = tmp;
+				}
+			}
+			SKIP2;
+			TEST_SS2;
+		}
+
+		if( b_acceleration )
+		{
+			SKIP;
+			float tmp[3];
+			for(k = 0, pc_new = pc; k < 6; k++)
+			{
+				for(n = 0; n < header->npart[k]; n++)
+				{
+					fread(&tmp, sizeof(float), 3, fd);
+					for(int j=0; j<3; j++) P[pc_new].Acc[j] = tmp[j];
+					pc_new++;
+				}
+			}
+			SKIP2;
+			TEST_SS2;
+		}
+
+		if( b_rate_entropy && header->npart[0] > 0 )
+		{
+			SKIP;
+			float tmp;
+			for(n = 0, pc_sph = pc; n < header->npart[0]; n++)
+			{
+				fread(&tmp, sizeof(float), 1, fd);
+				P[pc_sph].dAdt = tmp;
+				pc_sph++;
+			}
+			SKIP2;
+			TEST_SS2;
+		}
+
+		if( b_timestep )
+		{
+			SKIP;
+			float tmp;
+			for(k = 0, pc_new = pc; k < 6; k++)
+			{
+				for(n = 0; n < header->npart[k]; n++)
+				{
+					fread(&tmp, sizeof(float), 1, fd);
+					P[pc_new].ts = tmp;
 				}
 			}
 			SKIP2;
@@ -293,6 +564,239 @@ Particule_f Float_Gadget_Read_format2(const char *fname, Header *header, int fil
 		{
 			printf("allocating memory for %d particules...\n", NumPart);
 			if( (P = malloc(NumPart * sizeof(struct _particule_data_f))) == NULL )
+			{
+				perror("Allocate memory failed:");
+				return NULL;
+			}
+			printf("allocating memory...done\n");
+		}
+
+		GET_LABEL;
+
+		SKIP;
+		for(k = 0, pc_new = pc; k < 6; k++)
+		{
+			for(n = 0; n < header->npart[k]; n++)
+			{
+				fread(&P[pc_new].Pos[0], sizeof(float), 3, fd);
+				pc_new++;
+			}
+		}
+		SKIP2;
+		VERIFICATION;
+
+		GET_LABEL;
+
+		SKIP;
+		for(k = 0, pc_new = pc; k < 6; k++)
+		{
+			for(n = 0; n < header->npart[k]; n++)
+			{
+				fread(&P[pc_new].Vit[0], sizeof(float), 3, fd);
+				pc_new++;
+			}
+		}
+		SKIP2;
+		VERIFICATION;
+
+		GET_LABEL;
+
+		SKIP;
+		for(k = 0, pc_new = pc; k < 6; k++)
+		{
+			for(n = 0; n < header->npart[k]; n++)
+			{
+				/*fread(&Id[pc_new], sizeof(int), 1, fd);*/
+				fread(&P[pc_new].Id, sizeof(int), 1, fd);
+				pc_new++;
+			}
+		}
+		SKIP2;
+		VERIFICATION;
+
+		if(ntot_withmasses > 0)
+		{
+			GET_LABEL;
+			SKIP;
+		}
+		for(k = 0, pc_new = pc; k < 6; k++)
+		{
+			for(n = 0; n < header->npart[k]; n++)
+			{
+				P[pc_new].Type = k;
+
+				if(header->mass[k] == 0)
+					fread(&P[pc_new].m, sizeof(float), 1, fd);
+				else
+					P[pc_new].m = header->mass[k];
+				pc_new++;
+			}
+		}
+		if(ntot_withmasses > 0)
+		{
+			SKIP2;
+			VERIFICATION;
+		}
+
+		if(header->npart[0] > 0)
+		{
+			GET_LABEL;
+			SKIP;
+			for(n = 0, pc_sph = pc; n < header->npart[0]; n++)
+			{
+				fread(&P[pc_sph].U, sizeof(float), 1, fd);
+				pc_sph++;
+			}
+			SKIP2;
+			VERIFICATION;
+
+			GET_LABEL;
+			SKIP;
+			for(n = 0, pc_sph = pc; n < header->npart[0]; n++)
+			{
+				fread(&P[pc_sph].Rho, sizeof(float), 1, fd);
+				pc_sph++;
+			}
+			SKIP2;
+			VERIFICATION;
+
+			if(header->flag_cooling)
+			{
+				GET_LABEL;
+				SKIP;
+				for(n = 0, pc_sph = pc; n < header->npart[0]; n++)
+				{
+					fread(&P[pc_sph].Ne, sizeof(float), 1, fd);
+					pc_sph++;
+				}
+				SKIP2;
+				VERIFICATION;
+			}
+			else
+				for(n = 0, pc_sph = pc; n < header->npart[0]; n++)
+				{
+					P[pc_sph].Ne = 1.0;
+					pc_sph++;
+				}
+		}
+
+		if( b_potential )
+		{
+			GET_LABEL;
+			SKIP;
+			for(k = 0, pc_new = pc; k < 6; k++)
+			{
+				for(n = 0; n < header->npart[k]; n++)
+					fread(&P[pc_new].Pot, sizeof(float), 1, fd);
+			}
+			SKIP2;
+			VERIFICATION;
+		}
+
+		if( b_acceleration )
+		{
+			GET_LABEL;
+			SKIP;
+			for(k = 0, pc_new = pc; k < 6; k++)
+			{
+				for(n = 0; n < header->npart[k]; n++)
+					fread(&P[pc_new].Acc[0], sizeof(float), 3, fd);
+			}
+			SKIP2;
+			VERIFICATION;
+		}
+
+		if( b_rate_entropy && header->npart[0] > 0 )
+		{
+			GET_LABEL;
+			SKIP;
+			for(n = 0, pc_sph = pc; n < header->npart[0]; n++)
+			{
+				fread(&P[pc_sph].dAdt, sizeof(float), 1, fd);
+				pc_sph++;
+			}
+			SKIP2;
+			VERIFICATION;
+		}
+
+		if( b_timestep )
+		{
+			GET_LABEL;
+			SKIP;
+			for(k = 0, pc_new = pc; k < 6; k++)
+			{
+				for(n = 0; n < header->npart[k]; n++)
+				{
+					fread(&P[pc_new].ts, sizeof(float), 1, fd);
+				}
+			}
+			SKIP2;
+			VERIFICATION;
+		}
+
+		fclose(fd);
+	}
+
+	return P;
+}
+
+Particule_d Double_Gadget_Read_format2(const char *fname, Header *header, int files, bool b_potential, bool b_acceleration, bool b_rate_entropy, bool b_timestep)
+{
+	FILE *fd;
+	char buf[200], label[5] = {0};
+	int i, k, dummy, dummy2, ntot_withmasses;
+	int n, pc, pc_new, pc_sph;
+	int NumPart = 0;
+	Particule_d P = NULL;
+
+	for(i = 0, pc = 0; i < files; i++, pc = pc_new)
+	{
+		if(files > 1)
+			sprintf(buf, "%s.%d", fname, i);
+		else
+			sprintf(buf, "%s", fname);
+
+		if(!(fd = fopen(buf, "r")))
+		{
+			perror("Can't open file:");
+			printf("can't open file `%s`\n", buf);
+			/*error = "Can't open file.";*/
+			SetError("Can't open file.");
+			return NULL;
+			/*exit(EXIT_FAILURE);*/
+		}
+
+		printf("reading `%s' ...\n", buf);
+		fflush(stdout);
+
+		GET_LABEL;
+
+		SKIP;
+		fread(header, sizeof(Header), 1, fd);
+		SKIP2;
+		VERIFICATION;
+
+		if(files == 1)
+		{
+			for(k = 0, NumPart = 0, ntot_withmasses = 0; k < 6; k++)
+				NumPart += header->npart[k];
+		}
+		else
+		{
+			for(k = 0, NumPart = 0, ntot_withmasses = 0; k < 6; k++)
+				NumPart += header->npartTotal[k];
+		}
+
+		for(k = 0, ntot_withmasses = 0; k < 6; k++)
+		{
+			if(header->mass[k] == 0)
+				ntot_withmasses += header->npart[k];
+		}
+
+		if(i == 0)
+		{
+			printf("allocating memory for %d particules...\n", NumPart);
+			if( (P = malloc(NumPart * sizeof(struct _particule_data_d))) == NULL )
 			{
 				perror("Allocate memory failed:");
 				return NULL;

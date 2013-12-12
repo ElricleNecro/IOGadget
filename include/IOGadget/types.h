@@ -40,4 +40,19 @@ typedef struct _particule_data_f {
 	int Type;
 }*Particule_f;
 
+typedef struct _particule_data_d {
+	double Pos[3];
+	double Vit[3];
+	double m;
+	double Pot;
+	double Acc[3];
+	double dAdt;
+	double ts;
+	double Rho;
+	double U;
+	double Ne;
+	int Id;
+	int Type;
+}*Particule_d;
+
 #endif /* end of include guard */
