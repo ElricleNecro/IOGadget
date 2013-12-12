@@ -4,14 +4,14 @@
 #define SKIP2 fread(&dummy2, sizeof(dummy2), 1, fd);
 #define TEST_SS2 if(dummy != dummy2) { SetError("Wrong block!"); return NULL; }
 
-Particule Gadget_Read_format1(const char *fname, Header *header, int files, bool b_potential, bool b_acceleration, bool b_rate_entropy, bool b_timestep)
+Particule_d Double_Gadget_Read_format1(const char *fname, Header *header, int files, bool b_potential, bool b_acceleration, bool b_rate_entropy, bool b_timestep)
 {
 	FILE *fd;
 	char buf[200];
 	int i, k, dummy, dummy2, ntot_withmasses;
 	int n, pc, pc_new, pc_sph;
 	int NumPart = 0;
-	Particule P = NULL;
+	Particule_d P = NULL;
 
 	for(i = 0, pc = 0; i < files; i++, pc = pc_new)
 	{
@@ -57,7 +57,7 @@ Particule Gadget_Read_format1(const char *fname, Header *header, int files, bool
 		if(i == 0)
 		{
 			printf("allocating memory for %d particules...\n", NumPart);
-			if( (P = malloc(NumPart * sizeof(struct _particule_data))) == NULL )
+			if( (P = malloc(NumPart * sizeof(struct _particule_data_d))) == NULL )
 			{
 				perror("Allocate memory failed:");
 				SetError("Allocation failed!");
@@ -263,14 +263,14 @@ Particule Gadget_Read_format1(const char *fname, Header *header, int files, bool
 			VERIFICATION
 
 
-Particule Gadget_Read_format2(const char *fname, Header *header, int files, bool b_potential, bool b_acceleration, bool b_rate_entropy, bool b_timestep)
+Particule_d Double_Gadget_Read_format2(const char *fname, Header *header, int files, bool b_potential, bool b_acceleration, bool b_rate_entropy, bool b_timestep)
 {
 	FILE *fd;
 	char buf[200], label[5] = {0};
 	int i, k, dummy, dummy2, ntot_withmasses;
 	int n, pc, pc_new, pc_sph;
 	int NumPart = 0;
-	Particule P = NULL;
+	Particule_d P = NULL;
 
 	for(i = 0, pc = 0; i < files; i++, pc = pc_new)
 	{
@@ -319,7 +319,7 @@ Particule Gadget_Read_format2(const char *fname, Header *header, int files, bool
 		if(i == 0)
 		{
 			printf("allocating memory for %d particules...\n", NumPart);
-			if( (P = malloc(NumPart * sizeof(struct _particule_data))) == NULL )
+			if( (P = malloc(NumPart * sizeof(struct _particule_data_d))) == NULL )
 			{
 				perror("Allocate memory failed:");
 				return NULL;
