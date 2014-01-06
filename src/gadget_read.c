@@ -24,10 +24,8 @@ Particule_f Float_Gadget_Read_format1(const char *fname, Header *header, int fil
 		{
 			perror("Can't open file:");
 			printf("can't open file `%s`\n", buf);
-			/*error = "Can't open file.";*/
 			SetError("Can't open file.");
 			return NULL;
-			/*exit(EXIT_FAILURE);*/
 		}
 
 		fread(&dummy, sizeof(dummy), 1, fd);
@@ -307,7 +305,10 @@ Particule_d Double_Gadget_Read_format1(const char *fname, Header *header, int fi
 			{
 				float tmp[3];
 				fread(&tmp, sizeof(float), 3, fd);
-				for(int j=0; j<3; j++) P[pc_new].Pos[j] = tmp[j];
+				for(int j=0; j<3; j++)
+				{
+					P[pc_new].Pos[j] = tmp[j];
+				}
 				pc_new++;
 			}
 		}
@@ -321,7 +322,10 @@ Particule_d Double_Gadget_Read_format1(const char *fname, Header *header, int fi
 			{
 				float tmp[3];
 				fread(&tmp, sizeof(float), 3, fd);
-				for(int j=0; j<3; j++) P[pc_new].Vit[j] = tmp[j];
+				for(int j=0; j<3; j++)
+				{
+					P[pc_new].Vit[j] = tmp[j];
+				}
 				pc_new++;
 			}
 		}
