@@ -30,9 +30,6 @@ Particule_f Float_Gadget_Read_format1(const char *fname, Header *header, int fil
 			/*exit(EXIT_FAILURE);*/
 		}
 
-		printf("reading `%s' ...\n", buf);
-		fflush(stdout);
-
 		fread(&dummy, sizeof(dummy), 1, fd);
 		fread(header, sizeof(Header), 1, fd);
 		fread(&dummy, sizeof(dummy), 1, fd);
@@ -56,14 +53,12 @@ Particule_f Float_Gadget_Read_format1(const char *fname, Header *header, int fil
 
 		if(i == 0)
 		{
-			printf("allocating memory for %d particules...\n", NumPart);
 			if( (P = malloc(NumPart * sizeof(struct _particule_data_f))) == NULL )
 			{
 				perror("Allocate memory failed:");
 				SetError("Allocation failed!");
 				return NULL;
 			}
-			printf("allocating memory...done\n");
 		}
 
 		SKIP;
@@ -274,9 +269,6 @@ Particule_d Double_Gadget_Read_format1(const char *fname, Header *header, int fi
 			/*exit(EXIT_FAILURE);*/
 		}
 
-		printf("reading `%s' ...\n", buf);
-		fflush(stdout);
-
 		fread(&dummy, sizeof(dummy), 1, fd);
 		fread(header, sizeof(Header), 1, fd);
 		fread(&dummy, sizeof(dummy), 1, fd);
@@ -300,14 +292,12 @@ Particule_d Double_Gadget_Read_format1(const char *fname, Header *header, int fi
 
 		if(i == 0)
 		{
-			printf("allocating memory for %d particules...\n", NumPart);
 			if( (P = malloc(NumPart * sizeof(struct _particule_data_d))) == NULL )
 			{
 				perror("Allocate memory failed:");
 				SetError("Allocation failed!");
 				return NULL;
 			}
-			printf("allocating memory...done\n");
 		}
 
 		SKIP;
@@ -533,9 +523,6 @@ Particule_f Float_Gadget_Read_format2(const char *fname, Header *header, int fil
 			/*exit(EXIT_FAILURE);*/
 		}
 
-		printf("reading `%s' ...\n", buf);
-		fflush(stdout);
-
 		GET_LABEL;
 
 		SKIP;
@@ -562,13 +549,11 @@ Particule_f Float_Gadget_Read_format2(const char *fname, Header *header, int fil
 
 		if(i == 0)
 		{
-			printf("allocating memory for %d particules...\n", NumPart);
 			if( (P = malloc(NumPart * sizeof(struct _particule_data_f))) == NULL )
 			{
 				perror("Allocate memory failed:");
 				return NULL;
 			}
-			printf("allocating memory...done\n");
 		}
 
 		GET_LABEL;
@@ -766,9 +751,6 @@ Particule_d Double_Gadget_Read_format2(const char *fname, Header *header, int fi
 			/*exit(EXIT_FAILURE);*/
 		}
 
-		printf("reading `%s' ...\n", buf);
-		fflush(stdout);
-
 		GET_LABEL;
 
 		SKIP;
@@ -795,13 +777,11 @@ Particule_d Double_Gadget_Read_format2(const char *fname, Header *header, int fi
 
 		if(i == 0)
 		{
-			printf("allocating memory for %d particules...\n", NumPart);
 			if( (P = malloc(NumPart * sizeof(struct _particule_data_d))) == NULL )
 			{
 				perror("Allocate memory failed:");
 				return NULL;
 			}
-			printf("allocating memory...done\n");
 		}
 
 		GET_LABEL;
