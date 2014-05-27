@@ -182,6 +182,7 @@ Particule_f Float_Gadget_Read_format1(const char *fname, Header *header, int fil
 				{
 					fread(&tmp, sizeof(float), 1, fd);
 					P[pc_new].Pot = tmp;
+					pc_new++;
 				}
 			}
 			SKIP2;
@@ -428,6 +429,7 @@ Particule_d Double_Gadget_Read_format1(const char *fname, Header *header, int fi
 				{
 					fread(&tmp, sizeof(float), 1, fd);
 					P[pc_new].Pot = tmp;
+					pc_new++;
 				}
 			}
 			SKIP2;
@@ -475,6 +477,7 @@ Particule_d Double_Gadget_Read_format1(const char *fname, Header *header, int fi
 				{
 					fread(&tmp, sizeof(float), 1, fd);
 					P[pc_new].ts = tmp;
+					pc_new++;
 				}
 			}
 			SKIP2;
@@ -677,7 +680,10 @@ Particule_f Float_Gadget_Read_format2(const char *fname, Header *header, int fil
 			for(k = 0, pc_new = pc; k < 6; k++)
 			{
 				for(n = 0; n < header->npart[k]; n++)
+				{
 					fread(&P[pc_new].Pot, sizeof(float), 1, fd);
+					pc_new++;
+				}
 			}
 			SKIP2;
 			VERIFICATION;
@@ -690,7 +696,10 @@ Particule_f Float_Gadget_Read_format2(const char *fname, Header *header, int fil
 			for(k = 0, pc_new = pc; k < 6; k++)
 			{
 				for(n = 0; n < header->npart[k]; n++)
+				{
 					fread(&P[pc_new].Acc[0], sizeof(float), 3, fd);
+					pc_new++;
+				}
 			}
 			SKIP2;
 			VERIFICATION;
@@ -718,6 +727,7 @@ Particule_f Float_Gadget_Read_format2(const char *fname, Header *header, int fil
 				for(n = 0; n < header->npart[k]; n++)
 				{
 					fread(&P[pc_new].ts, sizeof(float), 1, fd);
+					pc_new++;
 				}
 			}
 			SKIP2;
@@ -905,7 +915,10 @@ Particule_d Double_Gadget_Read_format2(const char *fname, Header *header, int fi
 			for(k = 0, pc_new = pc; k < 6; k++)
 			{
 				for(n = 0; n < header->npart[k]; n++)
+				{
 					fread(&P[pc_new].Pot, sizeof(float), 1, fd);
+					pc_new++;
+				}
 			}
 			SKIP2;
 			VERIFICATION;
@@ -918,7 +931,10 @@ Particule_d Double_Gadget_Read_format2(const char *fname, Header *header, int fi
 			for(k = 0, pc_new = pc; k < 6; k++)
 			{
 				for(n = 0; n < header->npart[k]; n++)
+				{
 					fread(&P[pc_new].Acc[0], sizeof(float), 3, fd);
+					pc_new++;
+				}
 			}
 			SKIP2;
 			VERIFICATION;
@@ -946,6 +962,7 @@ Particule_d Double_Gadget_Read_format2(const char *fname, Header *header, int fi
 				for(n = 0; n < header->npart[k]; n++)
 				{
 					fread(&P[pc_new].ts, sizeof(float), 1, fd);
+					pc_new++;
 				}
 			}
 			SKIP2;
